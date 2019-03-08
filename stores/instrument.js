@@ -12,9 +12,8 @@ module.exports = function instrumentStore (state, emitter) {
     Soundfont.instrument(state.player.audioContext, instrumentId, {
       destination: state.player.merger
     })
-    .then(function (instrument) {
-      state.instrument = instrument
-    })
+      .then(function (instrument) {
+        state.instrument = instrument
+      })
   })
 }
-

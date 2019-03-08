@@ -12,10 +12,9 @@ module.exports = function keyboardStore (state, emitter) {
 
   document.body.addEventListener('keydown', ev => {
     var keyIndex = state.keyboard.keys.indexOf(ev.key)
-    if (keyIndex == -1) return
+    if (keyIndex === -1) return
     var note = state.notes[keyIndex]
     if (note == null) return
     emitter.emit('player:note', note)
   })
 }
-

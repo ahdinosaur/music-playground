@@ -5,14 +5,14 @@ module.exports = function playerView (state, emit) {
     <div>
       notes:
       ${state.notes.map(note => {
-        return html`
+    return html`
           <button
             onclick=${onPlay(note)}
           >
             ${note}
           </button>
         `
-      })}
+  })}
     </div>
   `
 
@@ -20,4 +20,3 @@ module.exports = function playerView (state, emit) {
     return ev => emit('player:note', note)
   }
 }
-

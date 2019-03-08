@@ -10,13 +10,13 @@ module.exports = function waveformStore (state, emitter) {
     data,
     range: [0, bufferLength],
     amplitude: [-0.1, +0.1],
-    color: [0,0,1,1],
+    color: [0, 0, 1, 1],
     thickness: '2px'
   }
 
-  requestAnimationFrame(analyse)
+  window.requestAnimationFrame(analyse)
   function analyse () {
-    requestAnimationFrame(analyse)
+    window.requestAnimationFrame(analyse)
 
     analyser.getFloatTimeDomainData(data)
 

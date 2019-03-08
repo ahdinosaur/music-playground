@@ -21,4 +21,3 @@ module.exports = class Waveform extends Component {
     return html`<div></div>`
   }
 }
-

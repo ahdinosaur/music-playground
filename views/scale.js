@@ -10,7 +10,7 @@ module.exports = function scaleView (state, emit) {
           <option
             value="${name}"
             id="${name}"
-            selected=${state.scale.note == name}
+            selected=${state.scale.note === name}
           >
             ${name}
           </option>
@@ -21,7 +21,7 @@ module.exports = function scaleView (state, emit) {
           <option
             value="${name}"
             id="${name}"
-            selected=${state.scale.type == name}
+            selected=${state.scale.type === name}
           >
             ${name}
           </option>

@@ -18,9 +18,4 @@ module.exports = function mainView (state, emit) {
       ${waveformView(state, emit)}
     </div>
   `
-
-  function onPlay () {
-    emit('player:note', 'C4')
-  }
 }
-

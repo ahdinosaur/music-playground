@@ -1,4 +1,3 @@
-var html = require('choo/html')
 var css = require('sheetify')
 var devtools = require('choo-devtools')
 var choo = require('choo')

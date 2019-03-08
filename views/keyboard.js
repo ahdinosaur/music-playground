@@ -1,15 +1,17 @@
 var html = require('choo/html')
 
 module.exports = function keyboardView (state, emit) {
+  var keyboards = state.keyboards
+
   return html`
     <div>
       keyboard:
       <select id="keyboard" onchange=${onKeyboardChange}>
-        ${state.keyboards.map(keyboard => html`
+        ${keyboards.map(keyboard => html`
           <option
             value="${keyboard.name}"
             id="${keyboard.name}"
-            selected=${keyboard == state.keyboard}
+            selected=${keyboard === state.keyboard}
           >
             ${keyboard.name}
           </option>
@@ -24,4 +26,3 @@ module.exports = function keyboardView (state, emit) {
     emit('keyboard', keyboard)
   }
 }
-

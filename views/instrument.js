@@ -17,9 +17,8 @@ module.exports = function instrumentView (state, emit) {
       </select>
     </div>
   `
-  
+
   function onInstrumentChange (ev) {
     emit('instrument', ev.target.value)
   }
 }
-

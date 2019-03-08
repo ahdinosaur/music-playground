@@ -19,4 +19,3 @@ module.exports = function playerStore (state, emitter) {
     state.instrument.play(note)
   })
 }
-
