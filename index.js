@@ -184,6 +184,7 @@ function playerStore (state, emitter) {
 
   emitter.on('player:note', function (note) {
     if (state.instrument == null) return
+    state.player.lastNote = note
     state.instrument.play(note)
   })
 }
@@ -244,8 +245,6 @@ class Waveform extends Component {
   }
 
   update (options) {
-    this.waveform.update(options)
-    this.waveform.render()
     return false
   }
 
@@ -261,8 +260,7 @@ function waveformView (state, emit) {
 
 function waveformStore (state, emitter) {
   var analyser = state.player.analyser
-  analyser.fftSize = 512
-  var bufferLength = analyser.frequencyBinCount
+  var bufferLength = 2048
   var data = new Float32Array(bufferLength)
 
   state.waveform = {
@@ -279,6 +277,22 @@ function waveformStore (state, emitter) {
 
     analyser.getFloatTimeDomainData(data)
 
-    state.cache(Waveform, 'waveform').render(state.waveform)
+    var waveformComponent = state.cache(Waveform, 'waveform')
+    var waveform = waveformComponent.waveform
+
+    // try to render a number of samples that is a multiple
+    // of the number of the samples from the frequency of the last note.
+    if (state.player.lastNote) {
+      var noteFreq = Tonal.Note.freq(state.player.lastNote)
+      var noteLength = state.player.audioContext.sampleRate / noteFreq
+      var noteRepeats = bufferLength / noteLength
+      var numSamples = Math.round(Math.floor(noteRepeats) * noteLength)
+      state.waveform.range = [bufferLength - numSamples, bufferLength]
+      waveform.update(state.waveform)
+    }
+
+    waveform.render()
+
+    waveformComponent.render(state.waveform)
   }
 }
