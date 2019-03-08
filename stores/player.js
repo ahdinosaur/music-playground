@@ -27,5 +27,6 @@ module.exports = function playerStore (state, emitter) {
     if (state.instrument == null) return
     state.player.lastNote = note
     state.instrument.play(note)
+    emitter.emit('render')
   })
 }
