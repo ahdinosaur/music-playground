@@ -2,13 +2,20 @@
 
 playground to learn music with synths and vocals
 
-```shell
-npm install --save music-playground
-```
+![screenshot](./screenshot.png)
 
 ## usage
 
-### `musicPlayground = require('music-playground')`
+TODO browse to <https://ahdinosaur.github.io/music-playground>
+
+## development
+
+```
+git clone https://github.com/ahdinosaur/music-playground
+cd music-playground
+npm install
+npm start
+```
 
 ## license
 
