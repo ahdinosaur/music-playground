@@ -4,11 +4,12 @@
   "description": "playground to learn music with synths and vocals",
   "main": "index.js",
   "scripts": {
-    "start": "electron main.js",
+    "build": "bankai build .",
+    "start": "bankai start .",
     "style:format": "prettier-standard '**/*.js' '**/*.md'",
     "style:lint": "standard",
     "style": "npm-run-all -s style:format style:lint",
-    "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i electron",
+    "test:deps": "dependency-check . && dependency-check . --extra --no-dev",
     "test": "npm-run-all -s style:lint test:deps"
   },
   "lint-staged": {
@@ -39,6 +40,7 @@
   },
   "homepage": "https://github.com/ahdinosaur/music-playground#readme",
   "devDependencies": {
+    "bankai": "^9.15.0",
     "dependency-check": "^3.1.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.0.5",
@@ -49,7 +51,6 @@
   "dependencies": {
     "choo": "^6.13.1",
     "choo-devtools": "^2.5.1",
-    "electron": "^4.0.7",
     "gl-waveform": "^4.3.3",
     "soundfont-player": "^0.11.0",
     "tonal": "^2.2.1"
