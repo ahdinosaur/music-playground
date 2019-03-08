@@ -14,6 +14,7 @@ app.use(instrumentStore)
 app.use(scaleStore)
 app.use(playerStore)
 app.use(waveformStore)
+app.use(microphoneStore)
 app.route('/', mainView)
 app.mount('main')
 
@@ -293,11 +294,22 @@ function waveformStore (state, emitter) {
       var noteRepeats = bufferLength / noteLength
       var numSamples = Math.round(Math.floor(noteRepeats) * noteLength)
       state.waveform.range = [bufferLength - numSamples, bufferLength]
-      waveform.update(state.waveform)
     }
 
+    waveform.update(state.waveform)
     waveform.render()
 
     waveformComponent.render(state.waveform)
   }
+}
+
+function microphoneStore (state, emitter) {
+  var constraints = { audio: true }
+  var source
+
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(stream => {
+      source = state.player.audioContext.createMediaStreamSource(stream)
+      source.connect(state.player.merger)
+    })
 }
