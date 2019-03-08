@@ -10,6 +10,7 @@ var app = choo()
 
 app.use(devtools())
 app.use(keyboardStore)
+app.use(instrumentStore)
 app.use(scaleStore)
 app.use(playerStore)
 app.use(waveformStore)
@@ -17,7 +18,7 @@ app.route('/', mainView)
 app.mount('main')
 
 app.emitter.on('DOMContentLoaded', () => {
-  app.emit('player:instrument', 'acoustic_grand_piano')
+  app.emit('instrument', 'acoustic_grand_piano')
 })
 
 function mainView (state, emit) {
@@ -25,6 +26,7 @@ function mainView (state, emit) {
     <main>
       ${keyboardView(state, emit)}
       ${scaleView(state, emit)}
+      ${instrumentView(state, emit)}
       ${playerView(state, emit)}
       ${waveformView(state, emit)}
     </main>
@@ -103,6 +105,47 @@ function scaleStore (state, emitter) {
   }
 }
 
+
+function instrumentView (state, emit) {
+  return html`
+    <div>
+      instrument:
+      <select id="instrument" onchange=${onInstrumentChange}>
+        ${instruments.map(instrumentId => html`
+          <option
+            value="${instrumentId}"
+            selected=${instrumentId == state.instrumentId}
+          >
+            ${instrumentId}
+          </option>
+        `)}
+      </select>
+    </div>
+  `
+  
+  function onInstrumentChange (ev) {
+    emit('instrument', ev.target.value)
+  }
+}
+
+var instruments = require('soundfont-player/instruments.json')
+
+function instrumentStore (state, emitter) {
+  state.instruments = instruments
+
+  emitter.on('instrument', function (instrumentId) {
+    state.instrumentId = instrumentId
+    state.instrument = null
+
+    Soundfont.instrument(state.player.audioContext, instrumentId, {
+      destination: state.player.merger
+    })
+    .then(function (instrument) {
+      state.instrument = instrument
+    })
+  })
+}
+
 function playerView (state, emit) {
   return html`
     <div>
@@ -128,21 +171,16 @@ function playerStore (state, emitter) {
   var audioContext = new window.AudioContext()
 
   var merger = audioContext.createChannelMerger(1)
-  var analyser = state.analyser = audioContext.createAnalyser()
+  var analyser = audioContext.createAnalyser()
+
+  state.player = {
+    audioContext,
+    merger,
+    analyser
+  }
 
   merger.connect(analyser)
   analyser.connect(audioContext.destination)
-
-
-  emitter.on('player:instrument', function (instrumentId) {
-    state.instrument = null
-    Soundfont.instrument(audioContext, instrumentId, {
-      destination: merger
-    })
-    .then(function (instrument) {
-      state.instrument = instrument
-    })
-  })
 
   emitter.on('player:note', function (note) {
     if (state.instrument == null) return
@@ -202,9 +240,7 @@ class Waveform extends Component {
   }
 
   load (element) {
-    this.waveform = new GlWaveform({
-      container: element
-    })
+    this.waveform = new GlWaveform()
   }
 
   update (options) {
@@ -224,7 +260,7 @@ function waveformView (state, emit) {
 }
 
 function waveformStore (state, emitter) {
-  var analyser = state.analyser
+  var analyser = state.player.analyser
   analyser.fftSize = 512
   var bufferLength = analyser.frequencyBinCount
   var data = new Float32Array(bufferLength)
