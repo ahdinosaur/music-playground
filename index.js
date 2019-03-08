@@ -6,13 +6,16 @@ css('./index.css')
 
 var app = choo()
 
-app.use(devtools())
+app.use(devtools({
+  filter: eventName => eventName !== 'player:data'
+}))
 app.use(require('./stores/keyboard'))
 app.use(require('./stores/instrument'))
 app.use(require('./stores/scale'))
 app.use(require('./stores/player'))
 app.use(require('./stores/waveform'))
-app.use(require('./stores/microphone.js'))
+app.use(require('./stores/pitchfinder'))
+app.use(require('./stores/microphone'))
 app.route('*', require('./views/main'))
 
 var tree = app.start()

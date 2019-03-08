@@ -4,10 +4,20 @@ module.exports = function playerStore (state, emitter) {
   var merger = audioContext.createChannelMerger(1)
   var analyser = audioContext.createAnalyser()
 
+  var bufferLength = 2048
+  var data = new Float32Array(bufferLength)
+  window.requestAnimationFrame(analyse)
+  function analyse () {
+    window.requestAnimationFrame(analyse)
+    analyser.getFloatTimeDomainData(data)
+    emitter.emit('player:data', data)
+  }
+
   state.player = {
     audioContext,
     merger,
-    analyser
+    analyser,
+    data
   }
 
   merger.connect(analyser)

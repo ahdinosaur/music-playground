@@ -55,6 +55,7 @@
     "choo-devtools": "^2.5.1",
     "gh-pages": "^2.0.1",
     "gl-waveform": "^4.3.3",
+    "pitchfinder": "^2.0.9",
     "soundfont-player": "^0.11.0",
     "tonal": "^2.2.1"
   }
