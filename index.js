@@ -45,6 +45,7 @@ function scaleView (state, emit) {
         ${Tonal.Note.names().map(name => html`
           <option
             value="${name}"
+            id="${name}"
             selected=${state.scale.note == name}
           >
             ${name}
@@ -55,6 +56,7 @@ function scaleView (state, emit) {
         ${Tonal.Scale.names().map(name => html`
           <option
             value="${name}"
+            id="${name}"
             selected=${state.scale.type == name}
           >
             ${name}
@@ -105,6 +107,7 @@ function scaleStore (state, emitter) {
   }
 }
 
+var instruments = require('soundfont-player/instruments.json')
 
 function instrumentView (state, emit) {
   return html`
@@ -114,7 +117,8 @@ function instrumentView (state, emit) {
         ${instruments.map(instrumentId => html`
           <option
             value="${instrumentId}"
-            selected=${instrumentId == state.instrumentId}
+            id="${instrumentId}"
+            selected=${instrumentId === state.instrumentId}
           >
             ${instrumentId}
           </option>
@@ -128,14 +132,14 @@ function instrumentView (state, emit) {
   }
 }
 
-var instruments = require('soundfont-player/instruments.json')
-
 function instrumentStore (state, emitter) {
   state.instruments = instruments
 
   emitter.on('instrument', function (instrumentId) {
     state.instrumentId = instrumentId
     state.instrument = null
+
+    emitter.emit('render')
 
     Soundfont.instrument(state.player.audioContext, instrumentId, {
       destination: state.player.merger
@@ -202,6 +206,7 @@ function keyboardView (state, emit) {
         ${keyboards.map(keyboard => html`
           <option
             value="${keyboard.name}"
+            id="${keyboard.name}"
             selected=${keyboard == state.keyboard}
           >
             ${keyboard.name}
