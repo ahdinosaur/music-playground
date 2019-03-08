@@ -6,7 +6,7 @@ playground to learn music with synths and vocals
 
 ## usage
 
-TODO browse to <https://ahdinosaur.github.io/music-playground>
+browse to <https://ahdinosaur.github.io/music-playground> and start playing! :dancer: :notes: :microphone:
 
 ## development
 

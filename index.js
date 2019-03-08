@@ -13,7 +13,7 @@ app.use(require('./stores/scale'))
 app.use(require('./stores/player'))
 app.use(require('./stores/waveform'))
 app.use(require('./stores/microphone.js'))
-app.route('/', require('./views/main'))
+app.route('*', require('./views/main'))
 
 var tree = app.start()
 document.body.appendChild(tree)

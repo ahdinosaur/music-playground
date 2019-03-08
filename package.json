@@ -4,7 +4,9 @@
   "description": "playground to learn music with synths and vocals",
   "main": "index.js",
   "scripts": {
-    "build": "bankai build .",
+    "build": "bankai build . --base .",
+    "deploy": "npm-run-all build push",
+    "push": "gh-pages -d dist",
     "start": "bankai start .",
     "style:format": "prettier-standard '**/*.js' '**/*.md'",
     "style:lint": "standard",
@@ -51,6 +53,7 @@
   "dependencies": {
     "choo": "^6.13.1",
     "choo-devtools": "^2.5.1",
+    "gh-pages": "^2.0.1",
     "gl-waveform": "^4.3.3",
     "soundfont-player": "^0.11.0",
     "tonal": "^2.2.1"
