@@ -1,11 +1,10 @@
 var html = require('choo/html')
 var devtools = require('choo-devtools')
 var choo = require('choo')
+var Component = require('choo/component')
 var Soundfont = require('soundfont-player')
-var Waveform = require('gl-waveform')
+var GlWaveform = require('gl-waveform')
 var Tonal = require('tonal')
-
-var audioContext = new window.AudioContext()
 
 var app = choo()
 
@@ -13,6 +12,7 @@ app.use(devtools())
 app.use(keyboardStore)
 app.use(scaleStore)
 app.use(playerStore)
+app.use(waveformStore)
 app.route('/', mainView)
 app.mount('main')
 
@@ -26,6 +26,7 @@ function mainView (state, emit) {
       ${keyboardView(state, emit)}
       ${scaleView(state, emit)}
       ${playerView(state, emit)}
+      ${waveformView(state, emit)}
     </main>
   `
 
@@ -70,27 +71,6 @@ function scaleView (state, emit) {
   }
 }
 
-function playerView (state, emit) {
-  return html`
-    <div>
-      notes:
-      ${state.notes.map(note => {
-        return html`
-          <button
-            onclick=${onPlay(note)}
-          >
-            ${note}
-          </button>
-        `
-      })}
-    </div>
-  `
-
-  function onPlay (note) {
-    return ev => emit('player:note', note)
-  }
-}
-
 function scaleStore (state, emitter) {
   state.scale = {
     note: 'C',
@@ -123,10 +103,43 @@ function scaleStore (state, emitter) {
   }
 }
 
+function playerView (state, emit) {
+  return html`
+    <div>
+      notes:
+      ${state.notes.map(note => {
+        return html`
+          <button
+            onclick=${onPlay(note)}
+          >
+            ${note}
+          </button>
+        `
+      })}
+    </div>
+  `
+
+  function onPlay (note) {
+    return ev => emit('player:note', note)
+  }
+}
+
 function playerStore (state, emitter) {
+  var audioContext = new window.AudioContext()
+
+  var merger = audioContext.createChannelMerger(1)
+  var analyser = state.analyser = audioContext.createAnalyser()
+
+  merger.connect(analyser)
+  analyser.connect(audioContext.destination)
+
+
   emitter.on('player:instrument', function (instrumentId) {
     state.instrument = null
-    Soundfont.instrument(audioContext, instrumentId).then(function (instrument) {
+    Soundfont.instrument(audioContext, instrumentId, {
+      destination: merger
+    })
+    .then(function (instrument) {
       state.instrument = instrument
     })
   })
@@ -180,4 +193,56 @@ function keyboardStore (state, emitter) {
     if (note == null) return
     emitter.emit('player:note', note)
   })
+}
+
+class Waveform extends Component {
+  constructor (id, state, emit) {
+    super(id)
+    this.local = state.components[id] = {}
+  }
+
+  load (element) {
+    this.waveform = new GlWaveform({
+      container: element
+    })
+  }
+
+  update (options) {
+    this.waveform.update(options)
+    this.waveform.render()
+    return false
+  }
+
+  createElement (options) {
+    this.local.options = options
+    return html`<div></div>`
+  }
+}
+
+function waveformView (state, emit) {
+  return state.cache(Waveform, 'waveform').render(state.waveform)
+}
+
+function waveformStore (state, emitter) {
+  var analyser = state.analyser
+  analyser.fftSize = 512
+  var bufferLength = analyser.frequencyBinCount
+  var data = new Float32Array(bufferLength)
+
+  state.waveform = {
+    data,
+    range: [0, bufferLength],
+    amplitude: [-0.1, +0.1],
+    color: [0,0,1,1],
+    thickness: '3em'
+  }
+
+  requestAnimationFrame(analyse)
+  function analyse () {
+    requestAnimationFrame(analyse)
+
+    analyser.getFloatTimeDomainData(data)
+
+    state.cache(Waveform, 'waveform').render(state.waveform)
+  }
 }
